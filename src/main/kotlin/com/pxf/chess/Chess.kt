@@ -1,6 +1,16 @@
 package com.pxf.chess
 
-data class Position(val row : Int, val col : Int)
+data class Position(val row : Int, val col : Int){
+    override fun equals(other: Any?): Boolean {
+        if (other == null || ! (other is Position))
+            return false
+        return row == other.row && col == other.col
+    }
+
+    override fun hashCode(): Int {
+        return 42 * row + 7 * col;
+    }
+}
 
 class Chess {
     private val pieces: MutableMap<Position, ChessPiece> = initPieces()
@@ -38,6 +48,19 @@ class Chess {
         }
         for (row in out)
             println(row.contentToString())
+    }
+
+    fun getPiecesCount(): Int {
+        return pieces.size
+    }
+
+    fun getPiece(predicate: (ChessPiece) -> (Boolean)): Pair<Position, ChessPiece> {
+        val out = pieces.filter { predicate(it.value) }.entries.first();
+        return Pair(out.key, out.value)
+    }
+
+    fun getPieces(): HashMap<Position, ChessPiece> {
+        return HashMap(pieces);
     }
 }
 

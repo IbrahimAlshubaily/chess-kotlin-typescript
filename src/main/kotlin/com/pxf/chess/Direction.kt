@@ -20,10 +20,10 @@ enum class Direction(private val rowOffset: Int, private val colOffset: Int) {
     KNIGHT_H(-1, -2);
 
     fun step(currPosition: Position, team: String) : Position {
-        val projection = if(team.equals("w")) 1 else -1
+        val projection = if(team.lowercase() == "w") 1 else -1
         return Position(
-            currPosition.row + (projection *rowOffset),
-            currPosition.col + (projection *colOffset)
+            currPosition.row + (projection * rowOffset),
+            currPosition.col + (projection * colOffset)
         )
     }
 
