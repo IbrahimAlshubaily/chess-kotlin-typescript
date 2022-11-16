@@ -1,5 +1,6 @@
 package com.pxf.chess
 
+
 data class Position(val row : Int, val col : Int){
     override fun equals(other: Any?): Boolean {
         if (other == null || ! (other is Position))
@@ -41,14 +42,17 @@ class Chess {
         return out
     }
 
-    fun print2D(gridSize: Int = 8) {
-        val out = Array(gridSize) { Array<String>(gridSize) { " --  " } }
+    override fun toString(): String {
+        val out = Array(8) { Array<String>(8) { " --  " } }
         pieces.forEach { entry ->
             out[entry.key.row][entry.key.col] = entry.value.toString()
         }
-        for (row in out)
-            println(row.contentToString())
+        return buildString{
+            for (row in out)
+                append(row.contentToString().plus("\n"))
+        }
     }
+
 
     fun getPiecesCount(): Int {
         return pieces.size
@@ -66,6 +70,6 @@ class Chess {
 
 fun main(){
     val chess = Chess()
-    chess.print2D()
+    println(chess)
 }
 
