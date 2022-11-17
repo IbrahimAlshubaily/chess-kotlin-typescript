@@ -2,16 +2,10 @@ package com.pxf.chess
 
 
 data class Position(val row : Int, val col : Int){
-    override fun equals(other: Any?): Boolean {
-        if (other == null || ! (other is Position))
-            return false
-        return row == other.row && col == other.col
-    }
-
-    override fun hashCode(): Int {
-        return 42 * row + 7 * col;
-    }
+    override fun equals(other: Any?) = (other is Position && row == other.row && col == other.col)
+    override fun hashCode() =  42 * row + 7 * col
 }
+data class Move(val origin : Position, val destination : Position)
 
 class Chess {
     private val pieces: MutableMap<Position, ChessPiece> = initPieces()
@@ -59,12 +53,24 @@ class Chess {
     }
 
     fun getPiece(predicate: (ChessPiece) -> (Boolean)): Pair<Position, ChessPiece> {
-        val out = pieces.filter { predicate(it.value) }.entries.first();
+        val out = pieces.filter { predicate(it.value) }.entries.first()
         return Pair(out.key, out.value)
     }
 
     fun getPieces(): HashMap<Position, ChessPiece> {
-        return HashMap(pieces);
+        return HashMap(pieces)
+    }
+
+    fun movePiece(move: Move): Boolean {
+        val piece = pieces[move.origin]
+        if (piece != null) {
+            if (piece.getMoves(HashMap(pieces)).contains(move.destination)) {
+                pieces.remove(move.origin)
+                pieces[move.destination] = piece
+                return true
+            }
+        }
+        return false
     }
 }
 

@@ -1,18 +1,21 @@
 package com.pxf.chess
 
 open class ChessPiece(
-    val repr: String,
+    private val repr: String,
     val team: String,
-    val nSteps: Int,
+    private val nSteps: Int,
     private val directions: List<Direction>
 ) {
 
     fun getMoves(pieces : HashMap<Position, ChessPiece>) : List<Position> {
+
         val out = mutableListOf<Position>()
         val myPosition = pieces.filter { it.value == this }.keys.first()
+
         for (dir in directions) {
-            var currPosition = myPosition;
+            var currPosition = myPosition
             for (i in 1..nSteps) {
+
                 currPosition = dir.step(currPosition, team)
                 if (pieces[currPosition]?.team != team)
                     out.add(currPosition)
