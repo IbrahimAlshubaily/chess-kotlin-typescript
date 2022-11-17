@@ -1,7 +1,7 @@
 package com.pxf.chess
 
 open class ChessPiece(
-    private val repr: String,
+    val repr: String,
     val team: String,
     private val nSteps: Int,
     private val directions: List<Direction>
@@ -17,6 +17,10 @@ open class ChessPiece(
             for (i in 1..nSteps) {
 
                 currPosition = dir.step(currPosition, team)
+                if(currPosition.row < 0 || currPosition.col < 0 ||
+                        currPosition.row > 7 || currPosition.col > 7)
+                    break
+
                 if (pieces[currPosition]?.team != team)
                     out.add(currPosition)
 

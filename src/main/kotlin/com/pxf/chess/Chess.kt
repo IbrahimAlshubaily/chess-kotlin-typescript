@@ -72,6 +72,11 @@ class Chess {
         }
         return false
     }
+
+    fun getMoves(position: Position): List<Position>?{
+        val piece = pieces.get(position)
+        return piece?.getMoves(HashMap(pieces))
+    }
 }
 
 fun main(){

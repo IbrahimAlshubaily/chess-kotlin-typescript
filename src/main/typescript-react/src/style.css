@@ -1,0 +1,26 @@
+* {
+  box-sizing: border-box;
+}
+
+.grid-cell {
+  width: 80px;
+  height: 80px;
+  background-color: peru;
+  border: 0.5px solid black;
+  text-align: center;
+  font-size: 70px;
+}
+.grid-row:nth-child(even) .grid-cell:nth-child(even),
+.grid-row:nth-child(odd) .grid-cell:nth-child(odd) {
+  background-color: brown;
+}
+
+.grid-row {
+  display: flex;
+}
+
+.grid {
+}
+
+.chess-peice {
+}
