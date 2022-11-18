@@ -19,8 +19,8 @@ enum class Direction(private val rowOffset: Int, private val colOffset: Int) {
     KNIGHT_G(-1, 2),
     KNIGHT_H(-1, -2);
 
-    fun step(currPosition: Position, team: String) : Position {
-        val projection = if(team.lowercase() == "w") 1 else -1
+    fun step(currPosition: Position, team: Team) : Position {
+        val projection = if(team == Team.WHITE) 1 else -1
         return Position(
             currPosition.row + (projection * rowOffset),
             currPosition.col + (projection * colOffset)

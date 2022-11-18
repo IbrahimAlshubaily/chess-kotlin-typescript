@@ -7,15 +7,18 @@ data class Position(val row : Int, val col : Int){
 }
 data class Move(val origin : Position, val destination : Position)
 
-class Chess {
-    private val pieces: MutableMap<Position, ChessPiece> = initPieces()
-    private fun initPieces(): MutableMap<Position, ChessPiece> {
-        val pieces = initTeam("W", 0, 1)
-        pieces.putAll(initTeam("B", 7, 6))
-        return pieces.toSortedMap(compareBy<Position> { it.row }.thenBy { it.col })
+class Chess(private val initialPieces: HashMap<Position, ChessPiece> = HashMap()) {
+    private var pieces: HashMap<Position, ChessPiece> = initPieces()
+    private fun initPieces(): HashMap<Position, ChessPiece> {
+        if (initialPieces.isNotEmpty())
+            return initialPieces
+
+        val pieces = initTeam(Team.WHITE, 0, 1)
+        pieces.putAll(initTeam(Team.BLACK, 7, 6))
+        return HashMap(pieces.toSortedMap(compareBy<Position> { it.row }.thenBy { it.col }))
     }
 
-    private fun initTeam(team: String, mainRow: Int, pawnRow: Int): MutableMap<Position, ChessPiece> {
+    private fun initTeam(team: Team, mainRow: Int, pawnRow: Int): MutableMap<Position, ChessPiece> {
 
         val out = mutableMapOf(
             Position(mainRow, 0) to Rook(team),
@@ -47,40 +50,53 @@ class Chess {
         }
     }
 
-
-    fun getPiecesCount(): Int {
-        return pieces.size
+    fun movePiece(move: Move): Boolean {
+        val piece = pieces[move.origin]
+        if (piece != null && piece.getMoves(pieces).contains(move.destination)) {
+            pieces.remove(move.origin)
+            pieces[move.destination] = piece
+            return true
+        }
+        return false
     }
 
-    fun getPiece(predicate: (ChessPiece) -> (Boolean)): Pair<Position, ChessPiece> {
-        val out = pieces.filter { predicate(it.value) }.entries.first()
-        return Pair(out.key, out.value)
+    fun minMaxStep(){
+        pieces = MinMax.getBestMoves(this).pieces
+    }
+
+
+    fun getMoves(position: Position): List<Position>{
+        val piece = pieces[position]
+        if (piece != null && piece.team == Team.BLACK)
+            return piece.getMoves(pieces)
+
+        return emptyList()
+    }
+
+    private fun parallelMove(move: Move): Chess {
+        val chess = Chess(HashMap(pieces.toMap()))
+        chess.movePiece(move)
+        return chess
+    }
+    fun getMoves(team: Team): List<Chess>{
+         return pieces.filter { it.value.team == team }
+             .map {
+                 it.value.getMoves(pieces).map { pos -> parallelMove(Move(it.key, pos))
+                 }
+         }.flatten().shuffled()
+
     }
 
     fun getPieces(): HashMap<Position, ChessPiece> {
         return HashMap(pieces)
     }
-
-    fun movePiece(move: Move): Boolean {
-        val piece = pieces[move.origin]
-        if (piece != null) {
-            if (piece.getMoves(HashMap(pieces)).contains(move.destination)) {
-                pieces.remove(move.origin)
-                pieces[move.destination] = piece
-                return true
-            }
-        }
-        return false
-    }
-
-    fun getMoves(position: Position): List<Position>?{
-        val piece = pieces.get(position)
-        return piece?.getMoves(HashMap(pieces))
-    }
 }
 
 fun main(){
     val chess = Chess()
-    println(chess)
+
+    println(MinMax.getBestMoves(chess))
+    println(MinMax.getBestMoves(chess))
+
 }
 

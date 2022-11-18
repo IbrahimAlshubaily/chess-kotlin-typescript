@@ -2,12 +2,13 @@ package com.pxf.chess
 
 open class ChessPiece(
     val repr: String,
-    val team: String,
+    val team: Team,
+    val huresticValue: Int,
     private val nSteps: Int,
     private val directions: List<Direction>
 ) {
 
-    fun getMoves(pieces : HashMap<Position, ChessPiece>) : List<Position> {
+    open fun getMoves(pieces : HashMap<Position, ChessPiece>) : List<Position> {
 
         val out = mutableListOf<Position>()
         val myPosition = pieces.filter { it.value == this }.keys.first()
@@ -30,28 +31,29 @@ open class ChessPiece(
         }
         return out
     }
-    override fun toString(): String = " ".plus(team).plus(repr).plus("  ")
+    fun huresticValue() = huresticValue
+    override fun toString(): String = " ".plus(team.toString().first()).plus(repr).plus("  ")
 }
 
-class Rook(team : String) :
-    ChessPiece("R", team, 8, Direction.getStraightDirections())
+class Pawn(team : Team) : ChessPiece("P", team, 1, 2, listOf(Direction.FORWARD)) {
+    override fun getMoves(pieces: HashMap<Position, ChessPiece>): List<Position> {
 
-class Bishop(team : String) :
-    ChessPiece("B", team, 8, Direction.getDiagonalDirections())
+        val moves = super.getMoves(pieces)
+            .filter { !pieces.contains(it) }
+            .toMutableList()
 
-class Knight(team : String) :
-    ChessPiece("N", team, 1, Direction.getKnightDirections())
+        val myPosition = pieces.filter { it.value == this }.keys.first()
+        for (dir in listOf(Direction.FORWARD_LEFT, Direction.FORWARD_RIGHT)){
+            val currPosition = dir.step(myPosition, team)
+            if (pieces[currPosition]?.team == team.getOpponent())
+                moves.add(currPosition)
+        }
+        return moves
+    }
+}
 
-class Queen(team : String) :
-    ChessPiece("Q", team, 8, Direction.getAllDirections())
-
-class King(team : String) :
-    ChessPiece("K", team, 1, Direction.getAllDirections())
-
-class Pawn(team : String) :
-    ChessPiece("P", team, 2, listOf(Direction.FORWARD)){}
-
-
-
-
-
+class Rook(team : Team) : ChessPiece("R", team, 6, 8, Direction.getStraightDirections())
+class Bishop(team : Team) : ChessPiece("B", team,6,  8, Direction.getDiagonalDirections())
+class Knight(team : Team) : ChessPiece("N", team, 4, 1, Direction.getKnightDirections())
+class Queen(team : Team) : ChessPiece("Q", team, 20, 8, Direction.getAllDirections())
+class King(team : Team) : ChessPiece("K", team, Int.MAX_VALUE, 1, Direction.getAllDirections())
