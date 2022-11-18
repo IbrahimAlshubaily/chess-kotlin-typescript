@@ -61,7 +61,7 @@ class Chess(private val initialPieces: HashMap<Position, ChessPiece> = HashMap()
     }
 
     fun minMaxStep(){
-        pieces = MinMax.getBestMoves(this).pieces
+        pieces = MinMax.getBestMoves(pieces)
     }
 
 
@@ -73,30 +73,24 @@ class Chess(private val initialPieces: HashMap<Position, ChessPiece> = HashMap()
         return emptyList()
     }
 
-    private fun parallelMove(move: Move): Chess {
-        val chess = Chess(HashMap(pieces.toMap()))
-        chess.movePiece(move)
-        return chess
-    }
-    fun getMoves(team: Team): List<Chess>{
-         return pieces.filter { it.value.team == team }
-             .map {
-                 it.value.getMoves(pieces).map { pos -> parallelMove(Move(it.key, pos))
-                 }
-         }.flatten().shuffled()
-
-    }
-
     fun getPieces(): HashMap<Position, ChessPiece> {
-        return HashMap(pieces)
+        return pieces
+    }
+
+    companion object {
+        fun makeMove(originalPieces: HashMap<Position, ChessPiece>, move: Move): HashMap<Position, ChessPiece> {
+            val pieces = HashMap(originalPieces)
+            pieces[move.destination] = pieces[move.origin]
+            pieces.remove(move.origin)
+            return pieces
+        }
     }
 }
 
 fun main(){
     val chess = Chess()
-
-    println(MinMax.getBestMoves(chess))
-    println(MinMax.getBestMoves(chess))
+    chess.minMaxStep()
+    println(chess)
 
 }
 
