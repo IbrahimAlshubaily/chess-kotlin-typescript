@@ -79,11 +79,6 @@ class Chess {
     }
 }
 
-fun main(){
-    val chess = Chess()
-    chess.minMaxStep()
-    println(chess)
-}
 
 
 data class Position(val row : Int, val col : Int){
