@@ -10,6 +10,7 @@ class ChessController(private val chess: Chess = Chess()) {
     @GetMapping("/board")
     @CrossOrigin
     fun getChessBoard() = JSONArray(chess.getPieces().map {
+        println(chess.toString())
         JSONObject(mapOf(
                 "row" to it.key.row ,
                 "col" to it.key.col ,
