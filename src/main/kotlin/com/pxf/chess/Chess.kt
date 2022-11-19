@@ -1,21 +1,13 @@
 package com.pxf.chess
 
 
-data class Position(val row : Int, val col : Int){
-    override fun equals(other: Any?) = (other is Position && row == other.row && col == other.col)
-    override fun hashCode() =  42 * row + 7 * col
-}
-data class Move(val origin : Position, val destination : Position)
-
-class Chess(private val initialPieces: HashMap<Position, ChessPiece> = HashMap()) {
+class Chess {
     private var pieces: HashMap<Position, ChessPiece> = initPieces()
     private fun initPieces(): HashMap<Position, ChessPiece> {
-        if (initialPieces.isNotEmpty())
-            return initialPieces
-
-        val pieces = initTeam(Team.WHITE, 0, 1)
-        pieces.putAll(initTeam(Team.BLACK, 7, 6))
-        return HashMap(pieces.toSortedMap(compareBy<Position> { it.row }.thenBy { it.col }))
+        return HashMap(
+            initTeam(Team.WHITE, 0, 1)
+            .plus(initTeam(Team.BLACK, 7, 6))
+            .toSortedMap(compareBy<Position> { it.row }.thenBy { it.col }))
     }
 
     private fun initTeam(team: Team, mainRow: Int, pawnRow: Int): MutableMap<Position, ChessPiece> {
@@ -41,13 +33,10 @@ class Chess(private val initialPieces: HashMap<Position, ChessPiece> = HashMap()
 
     override fun toString(): String {
         val out = Array(8) { Array<String>(8) { " --  " } }
-        pieces.forEach { entry ->
-            out[entry.key.row][entry.key.col] = entry.value.toString()
+        pieces.forEach {
+            out[it.key.row][it.key.col] = it.value.toString()
         }
-        return buildString{
-            for (row in out)
-                append(row.contentToString().plus("\n"))
-        }
+        return out.joinToString(separator = "\n") { it.contentToString() }
     }
 
     fun movePiece(move: Move): Boolean {
@@ -55,6 +44,7 @@ class Chess(private val initialPieces: HashMap<Position, ChessPiece> = HashMap()
         if (piece != null && piece.getMoves(pieces).contains(move.destination)) {
             pieces.remove(move.origin)
             pieces[move.destination] = piece
+            promotePawn(pieces, move.destination)
             return true
         }
         return false
@@ -64,25 +54,27 @@ class Chess(private val initialPieces: HashMap<Position, ChessPiece> = HashMap()
         pieces = MinMax.getBestMoves(pieces)
     }
 
+    fun getMoves(position: Position) =
+        if (pieces[position]?.team == Team.BLACK) pieces[position]?.getMoves(pieces)
+        else emptyList()
 
-    fun getMoves(position: Position): List<Position>{
-        val piece = pieces[position]
-        if (piece != null && piece.team == Team.BLACK)
-            return piece.getMoves(pieces)
-
-        return emptyList()
-    }
-
-    fun getPieces(): HashMap<Position, ChessPiece> {
-        return pieces
-    }
+    fun getPieces() = pieces
 
     companion object {
         fun makeMove(originalPieces: HashMap<Position, ChessPiece>, move: Move): HashMap<Position, ChessPiece> {
             val pieces = HashMap(originalPieces)
-            pieces[move.destination] = pieces[move.origin]
-            pieces.remove(move.origin)
+            pieces[move.destination] = pieces.remove(move.origin)
+            promotePawn(pieces, move.destination)
             return pieces
+        }
+
+        fun promotePawn(pieces: HashMap<Position, ChessPiece>, position: Position){
+            val piece = pieces[position]
+            if(piece != null && piece.repr.lowercase() == "p" &&
+                ((piece.team == Team.BLACK && position.row == 0) ||
+                (piece.team == Team.WHITE && position.row == 7))
+            )
+                pieces[position] = Queen(piece.team)
         }
     }
 }
@@ -91,6 +83,11 @@ fun main(){
     val chess = Chess()
     chess.minMaxStep()
     println(chess)
-
 }
 
+
+data class Position(val row : Int, val col : Int){
+    override fun equals(other: Any?) = (other is Position && row == other.row && col == other.col)
+    override fun hashCode() =  42 * row + 7 * col
+}
+data class Move(val origin : Position, val destination : Position)

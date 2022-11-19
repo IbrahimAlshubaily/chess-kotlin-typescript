@@ -51,6 +51,7 @@ class MinMax {
             }
         }
 
+
         private fun eval(pieces: HashMap<Position, ChessPiece>): Int{
             return evalTeam(pieces, Team.WHITE) - evalTeam(pieces, Team.BLACK)
         }
