@@ -1,6 +1,6 @@
 package com.pxf.chess
 
-
+import com.pxf.chess.ChessPieces.*
 class Chess {
     private var pieces: HashMap<Position, ChessPiece> = initPieces()
     private fun initPieces(): HashMap<Position, ChessPiece> {
@@ -11,23 +11,11 @@ class Chess {
     }
 
     private fun initTeam(team: Team, mainRow: Int, pawnRow: Int): MutableMap<Position, ChessPiece> {
-
-        val out = mutableMapOf(
-            Position(mainRow, 0) to Rook(team),
-            Position(mainRow, 1) to Bishop(team),
-            Position(mainRow, 2) to Knight(team),
-
-            Position(mainRow, 3) to Queen(team),
-            Position(mainRow, 4) to King(team),
-
-            Position(mainRow, 5) to Knight(team),
-            Position(mainRow, 6) to Bishop(team),
-            Position(mainRow, 7) to Rook(team)
-        )
-
-        for (i in 0..7)
-            out[Position(pawnRow, i)] = Pawn(team)
-
+        val out = mutableMapOf<Position, ChessPiece>()
+        for ((col, piece) in listOf(ROOK, BISHOP, KNIGHT, QUEEN, KING, KNIGHT, BISHOP, ROOK).withIndex()){
+            out[Position(mainRow, col)] = ChessPiece.ChessPieceFactory(piece, team)
+            out[Position(pawnRow, col)] = Pawn(team)
+        }
         return out
     }
 
@@ -78,8 +66,6 @@ class Chess {
         }
     }
 }
-
-
 
 data class Position(val row : Int, val col : Int){
     override fun equals(other: Any?) = (other is Position && row == other.row && col == other.col)

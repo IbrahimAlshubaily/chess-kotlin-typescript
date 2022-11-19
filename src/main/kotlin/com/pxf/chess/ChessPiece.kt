@@ -1,5 +1,7 @@
 package com.pxf.chess
 
+enum class ChessPieces { KING, QUEEN, KNIGHT, BISHOP, ROOK, PAWN }
+
 open class ChessPiece(
     val repr: String,
     val team: Team,
@@ -33,6 +35,19 @@ open class ChessPiece(
     }
     fun huresticValue() = huresticValue
     override fun toString(): String = " ".plus(team.toString().first()).plus(repr).plus("  ")
+
+    companion object{
+        fun ChessPieceFactory(piece : ChessPieces, team: Team): ChessPiece{
+            return when(piece){
+                ChessPieces.KING -> King(team)
+                ChessPieces.QUEEN -> Queen(team)
+                ChessPieces.KNIGHT -> Knight(team)
+                ChessPieces.BISHOP -> Bishop(team)
+                ChessPieces.ROOK -> Rook(team)
+                ChessPieces.PAWN -> Pawn(team)
+            }
+        }
+    }
 }
 
 class Pawn(team : Team) : ChessPiece("P", team, 1, 2, listOf(Direction.FORWARD)) {
