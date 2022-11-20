@@ -10,7 +10,6 @@ class ChessController(private val chess: Chess = Chess()) {
     @GetMapping("/board")
     @CrossOrigin
     fun getChessBoard() = JSONArray(chess.getPieces().map {
-        println(chess.toString())
         JSONObject(mapOf(
                 "row" to it.key.row ,
                 "col" to it.key.col ,
@@ -41,13 +40,15 @@ class ChessController(private val chess: Chess = Chess()) {
     @PostMapping("/move")
     @CrossOrigin
     fun moveChessPiece(@RequestBody move : Move) : String {
-        if (chess.getPieces()[move.origin]?.team != Team.BLACK)
-            return getChessBoard()
-
-        val moved = chess.movePiece(move)
-        if (moved)
-            chess.minMaxStep()
-        return getChessBoard()
+        val out = JSONObject()
+        if (chess.getPieces()[move.origin]?.team == Team.BLACK){
+            val moved = chess.movePiece(move)
+            if (moved){
+                out.put("move", chess.minMaxStep())
+                out.put("board", getChessBoard())
+            }
+        }
+        return out.toString()
     }
 
 }

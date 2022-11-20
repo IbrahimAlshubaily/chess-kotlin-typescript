@@ -13,7 +13,7 @@ class Chess {
     private fun initTeam(team: Team, mainRow: Int, pawnRow: Int): MutableMap<Position, ChessPiece> {
         val out = mutableMapOf<Position, ChessPiece>()
         for ((col, piece) in listOf(ROOK, BISHOP, KNIGHT, QUEEN, KING, KNIGHT, BISHOP, ROOK).withIndex()){
-            out[Position(mainRow, col)] = ChessPiece.ChessPieceFactory(piece, team)
+            out[Position(mainRow, col)] = ChessPiece.chessPieceFactory(piece, team)
             out[Position(pawnRow, col)] = Pawn(team)
         }
         return out
@@ -38,15 +38,21 @@ class Chess {
         return false
     }
 
-    fun minMaxStep(){
-        pieces = MinMax.getBestMoves(pieces)
+    fun minMaxStep(): Move{
+        val nextPieces = MinMax.getBestMoves(pieces)
+        val prevPos = pieces.keys.toSet().subtract(nextPieces.keys.toSet())
+        val newPos = nextPieces.keys.toSet().subtract(pieces.keys.toSet())
+        println(prevPos.first())
+        println(newPos.first())
+        pieces = nextPieces
+        return Move(prevPos.first(), newPos.first())
     }
 
     fun getMoves(position: Position) =
         if (pieces[position]?.team == Team.BLACK) pieces[position]?.getMoves(pieces)
         else emptyList()
 
-    fun getPieces() = pieces
+    fun getPieces():Map<Position, ChessPiece> = pieces
 
     companion object {
         fun makeMove(originalPieces: HashMap<Position, ChessPiece>, move: Move): HashMap<Position, ChessPiece> {

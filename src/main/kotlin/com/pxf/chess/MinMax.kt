@@ -56,7 +56,7 @@ class MinMax {
             return evalTeam(pieces, Team.WHITE) - evalTeam(pieces, Team.BLACK)
         }
         private fun evalTeam(pieces: HashMap<Position, ChessPiece>, team: Team): Int {
-            return pieces.filter { it.value.team == team }.map { it.value.huresticValue() }.sum()
+            return pieces.filter { it.value.team == team }.map { it.value.heuristicValue() }.sum()
         }
     }
 

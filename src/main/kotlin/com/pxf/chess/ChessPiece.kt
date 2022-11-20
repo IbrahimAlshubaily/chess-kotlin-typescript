@@ -33,23 +33,26 @@ open class ChessPiece(
         }
         return out
     }
-    fun huresticValue() = huresticValue
+    fun heuristicValue() = huresticValue
     override fun toString(): String = " ".plus(team.toString().first()).plus(repr).plus("  ")
 
     companion object{
-        fun ChessPieceFactory(piece : ChessPieces, team: Team): ChessPiece{
-            return when(piece){
+        fun chessPieceFactory(piece : ChessPieces, team: Team) = when(piece) {
                 ChessPieces.KING -> King(team)
                 ChessPieces.QUEEN -> Queen(team)
                 ChessPieces.KNIGHT -> Knight(team)
                 ChessPieces.BISHOP -> Bishop(team)
                 ChessPieces.ROOK -> Rook(team)
                 ChessPieces.PAWN -> Pawn(team)
-            }
         }
     }
 }
 
+class Rook(team : Team) : ChessPiece("R", team, 6, 8, Direction.getStraightDirections())
+class Bishop(team : Team) : ChessPiece("B", team,6,  8, Direction.getDiagonalDirections())
+class Knight(team : Team) : ChessPiece("N", team, 4, 1, Direction.getKnightDirections())
+class Queen(team : Team) : ChessPiece("Q", team, 20, 8, Direction.getAllDirections())
+class King(team : Team) : ChessPiece("K", team, Int.MAX_VALUE, 1, Direction.getAllDirections())
 class Pawn(team : Team) : ChessPiece("P", team, 1, 2, listOf(Direction.FORWARD)) {
     override fun getMoves(pieces: HashMap<Position, ChessPiece>): List<Position> {
 
@@ -66,9 +69,3 @@ class Pawn(team : Team) : ChessPiece("P", team, 1, 2, listOf(Direction.FORWARD))
         return moves
     }
 }
-
-class Rook(team : Team) : ChessPiece("R", team, 6, 8, Direction.getStraightDirections())
-class Bishop(team : Team) : ChessPiece("B", team,6,  8, Direction.getDiagonalDirections())
-class Knight(team : Team) : ChessPiece("N", team, 4, 1, Direction.getKnightDirections())
-class Queen(team : Team) : ChessPiece("Q", team, 20, 8, Direction.getAllDirections())
-class King(team : Team) : ChessPiece("K", team, Int.MAX_VALUE, 1, Direction.getAllDirections())
